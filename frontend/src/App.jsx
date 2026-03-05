@@ -1,27 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Table, 
-  Button, 
-  Typography, 
-  ConfigProvider, 
-  theme, 
-  Space, 
-  Popconfirm, 
+import {
+  Table,
+  Button,
+  Typography,
+  ConfigProvider,
+  theme,
+  Space,
+  Popconfirm,
   message,
   Empty,
-  Spin
+  Spin,
+  Divider,
+  Tag
 } from 'antd';
-import { 
-  DeleteOutlined, 
-  SunOutlined, 
-  MoonOutlined, 
-  UserOutlined, 
+import {
+  DeleteOutlined,
+  SunOutlined,
+  MoonOutlined,
+  UserOutlined,
   ClockCircleOutlined,
-  ReloadOutlined 
+  ReloadOutlined,
+  CheckCircleOutlined,
+  WarningOutlined,
+  InfoCircleOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const API_URL = '/api/appointments';
 
@@ -133,26 +139,60 @@ function App() {
 
   const algorithm = isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm;
 
+  const colors = {
+    primary: '#1677ff',
+    secondary: '#722ed1',
+    accent: '#fa8c16',
+    success: '#52c41a',
+    warning: '#faad14',
+    error: '#ff4d4f',
+    info: '#1677ff',
+  };
+
   const customTheme = {
     algorithm,
     token: {
-      colorPrimary: '#1890ff',
-      borderRadius: 6,
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      colorPrimary: colors.primary,
+      borderRadius: 8,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
       fontSize: 14,
+      fontSizeLG: 16,
+      fontSizeXL: 18,
+      fontSizeHeading1: 38,
+      fontSizeHeading2: 30,
+      fontSizeHeading3: 24,
+      fontSizeHeading4: 20,
+      fontSizeHeading5: 16,
+      lineHeightHeading1: 1.2,
+      lineHeightHeading2: 1.25,
+      lineHeightHeading3: 1.3,
+      fontWeightStrong: 600,
     },
     components: {
+      Typography: {
+        titleColor: isDarkMode ? '#e5e5e5' : '#1f1f1f',
+        titleColorLight: isDarkMode ? '#bfbfbf' : '#8c8c8c',
+        titleH1Color: isDarkMode ? '#f0f0f0' : '#001529',
+        titleH2Color: isDarkMode ? '#e5e5e5' : '#003a8c',
+        titleH3Color: isDarkMode ? '#d9d9d9' : '#0050b3',
+        titleFontWeight: 600,
+        titleMarginBottom: '0.5em',
+      },
       Table: {
         headerBg: isDarkMode ? '#1d1d1d' : '#fafafa',
         headerColor: isDarkMode ? '#e8e8e8' : '#262626',
         rowHoverBg: isDarkMode ? '#262626' : '#e6f7ff',
         borderColor: isDarkMode ? '#434343' : '#f0f0f0',
+        colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff',
       },
       Button: {
         algorithm: true,
+        colorPrimary: colors.primary,
+        colorPrimaryHover: '#4096ff',
+        colorPrimaryActive: '#0958d9',
       },
-      Typography: {
-        titleColor: isDarkMode ? '#e8e8e8' : '#262626',
+      Card: {
+        colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff',
       },
     },
   };
@@ -162,51 +202,68 @@ function App() {
       <div style={{
         minHeight: '100vh',
         padding: '24px',
-        background: isDarkMode ? '#141414' : '#f0f2f5',
+        background: isDarkMode ? '#0b0f1a' : '#f0f2f5',
         transition: 'background 0.3s',
       }}>
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
         }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '24px',
-            flexWrap: 'wrap',
-            gap: '16px',
+          <Title level={1} style={{
+            margin: '0 0 8px 0',
+            fontWeight: 700,
+            letterSpacing: '-0.5px',
           }}>
-            <Title level={2} style={{ margin: 0 }}>
-              📋 Записи на приём
-            </Title>
-            
-            <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={loadAppointments}
-                loading={loading}
-              >
-                Обновить
-              </Button>
-              
-              <Button
-                icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
-                onClick={() => setIsDarkMode(!isDarkMode)}
-              >
-                {isDarkMode ? 'Дневная' : 'Ночная'}
-              </Button>
-            </Space>
-          </div>
+            📋 Система управления записями
+          </Title>
+
+          <Title level={2} style={{
+            margin: '0 0 24px 0',
+            fontWeight: 600,
+            color: isDarkMode ? '#bfbfbf' : '#595959',
+          }}>
+            Панель администратора
+          </Title>
 
           <div style={{
             background: isDarkMode ? '#1f1f1f' : '#ffffff',
-            borderRadius: '8px',
+            borderRadius: '12px',
             padding: '24px',
-            boxShadow: isDarkMode 
-              ? '0 1px 2px 0 rgba(0, 0, 0, 0.5)' 
-              : '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+            boxShadow: isDarkMode
+              ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+              : '0 2px 8px rgba(0, 0, 0, 0.08)',
           }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '24px',
+              flexWrap: 'wrap',
+              gap: '16px',
+            }}>
+              <Title level={4} style={{ margin: 0 }}>
+                Записи на приём
+              </Title>
+
+              <Space>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={loadAppointments}
+                  loading={loading}
+                  type="primary"
+                >
+                  Обновить
+                </Button>
+
+                <Button
+                  icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                >
+                  {isDarkMode ? 'Дневная' : 'Ночная'}
+                </Button>
+              </Space>
+            </div>
+
             {loading && appointments.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 0' }}>
                 <Spin size="large" tip="Загрузка..." />
@@ -225,8 +282,8 @@ function App() {
                 }}
                 locale={{
                   emptyText: (
-                    <Empty 
-                      description="Нет записей" 
+                    <Empty
+                      description="Нет записей"
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                     />
                   ),
